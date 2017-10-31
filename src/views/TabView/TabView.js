@@ -1,8 +1,9 @@
 /* @flow */
 
 import React, { PureComponent } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Platform } from 'react-native';
 import { TabViewAnimated, TabViewPagerPan } from 'react-native-tab-view';
+import type { Layout } from 'react-native-tab-view/src/TabViewTypeDefinitions';
 import SceneView from '../SceneView';
 import withCachedChildNavigation from '../../withCachedChildNavigation';
 
@@ -22,6 +23,7 @@ export type TabViewConfig = {
   swipeEnabled?: boolean,
   animationEnabled?: boolean,
   lazy?: boolean,
+  initialLayout?: Layout,
 };
 
 export type TabScene = {
@@ -38,6 +40,7 @@ type Props = {
   swipeEnabled?: boolean,
   animationEnabled?: boolean,
   lazy?: boolean,
+  initialLayout?: Layout,
 
   screenProps?: {},
   navigation: NavigationScreenProp<NavigationState, NavigationAction>,
@@ -51,7 +54,14 @@ type Props = {
   },
 };
 
-class TabView extends PureComponent<void, Props, void> {
+class TabView extends PureComponent<$Shape<Props>, Props, void> {
+  static defaultProps = {
+    // fix for https://github.com/react-native-community/react-native-tab-view/issues/312
+    initialLayout: Platform.select({
+      android: { width: 1, height: 0 },
+    }),
+  };
+
   props: Props;
 
   _handlePageChanged = (index: number) => {
@@ -160,6 +170,7 @@ class TabView extends PureComponent<void, Props, void> {
       animationEnabled,
       swipeEnabled,
       lazy,
+      initialLayout,
       screenProps,
     } = this.props;
 
@@ -190,6 +201,7 @@ class TabView extends PureComponent<void, Props, void> {
 
     const props = {
       lazy,
+      initialLayout,
       animationEnabled,
       swipeEnabled,
       renderPager,
